@@ -25,6 +25,9 @@ COPY backend/ /var/www/html/
 # Копирование конфигурации nginx
 COPY backend/nginx.conf /etc/nginx/sites-available/default
 
+# Копирование php.ini
+COPY backend/php.ini /usr/local/etc/php/conf.d/custom.ini
+
 # Установка прав доступа
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html

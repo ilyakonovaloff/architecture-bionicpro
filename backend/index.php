@@ -44,12 +44,29 @@ function validateTokenAndRole() {
     }
 
     $hasProtheticRole = false;
-    if (isset($payload['realm_access']['roles']) && in_array('prothetic_user', $payload['realm_access']['roles'])) {
-        $hasProtheticRole = true;
+    
+    // Проверяем realm_access.roles
+    if (isset($payload['realm_access'])) {
+        $realmAccess = $payload['realm_access'];
+        if (is_object($realmAccess)) {
+            $realmAccess = (array)$realmAccess;
+        }
+        if (isset($realmAccess['roles']) && is_array($realmAccess['roles']) && in_array('prothetic_user', $realmAccess['roles'])) {
+            $hasProtheticRole = true;
+        }
     }
+    
+    // Проверяем resource_access
     if (isset($payload['resource_access'])) {
-        foreach ($payload['resource_access'] as $client => $access) {
-            if (isset($access['roles']) && in_array('prothetic_user', $access['roles'])) {
+        $resourceAccess = $payload['resource_access'];
+        if (is_object($resourceAccess)) {
+            $resourceAccess = (array)$resourceAccess;
+        }
+        foreach ($resourceAccess as $client => $access) {
+            if (is_object($access)) {
+                $access = (array)$access;
+            }
+            if (isset($access['roles']) && is_array($access['roles']) && in_array('prothetic_user', $access['roles'])) {
                 $hasProtheticRole = true;
                 break;
             }
