@@ -5,9 +5,21 @@ RUN apt-get update && apt-get install -y \
     nginx \
     libzip-dev \
     zip \
+    git \
+    unzip \
     && docker-php-ext-install zip
 
-# Копирование файлов приложения
+# Установка Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Копирование composer.json и composer.lock
+COPY composer.json composer.lock /var/www/html/
+
+# Установка зависимостей Composer
+WORKDIR /var/www/html
+RUN composer install --no-dev --optimize-autoloader
+
+# Копирование остальных файлов приложения
 COPY . /var/www/html/
 
 # Копирование конфигурации nginx
