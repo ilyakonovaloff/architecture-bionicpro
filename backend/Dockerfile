@@ -12,18 +12,18 @@ RUN apt-get update && apt-get install -y \
 # Установка Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Копирование composer.json и composer.lock
+# Копирование composer.json и composer.lock из корня проекта
 COPY composer.json composer.lock /var/www/html/
 
 # Установка зависимостей Composer
 WORKDIR /var/www/html
 RUN composer install --no-dev --optimize-autoloader
 
-# Копирование остальных файлов приложения
-COPY . /var/www/html/
+# Копирование файлов backend
+COPY backend/ /var/www/html/
 
 # Копирование конфигурации nginx
-COPY nginx.conf /etc/nginx/sites-available/default
+COPY backend/nginx.conf /etc/nginx/sites-available/default
 
 # Установка прав доступа
 RUN chown -R www-data:www-data /var/www/html \
@@ -36,4 +36,4 @@ RUN rm -f /etc/nginx/sites-enabled/default \
 EXPOSE 80
 
 # Запуск nginx и php-fpm
-CMD service nginx start && php-fpm 
+CMD service nginx start && php-fpm
